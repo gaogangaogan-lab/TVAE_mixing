@@ -1,0 +1,86 @@
+{
+  "pima": {
+    "lr": {
+      "C": 0.1,
+      "class_weight": "balanced",
+      "penalty": "l2"
+    },
+    "rf": {
+      "n_estimators": 200,
+      "min_samples_split": 5,
+      "min_samples_leaf": 10,
+      "max_features": null,
+      "max_depth": 8,
+      "criterion": "gini",
+      "class_weight": "balanced",
+      "bootstrap": true
+    },
+    "xgb": {
+      "subsample": 0.9,
+      "reg_lambda": 5,
+      "reg_alpha": 0.001,
+      "n_estimators": 100,
+      "min_child_weight": 3,
+      "max_depth": 2,
+      "learning_rate": 0.05,
+      "gamma": 1,
+      "colsample_bytree": 1.0
+    }
+  },
+  "cleveland": {
+    "lr": {
+      "C": 1,
+      "class_weight": null,
+      "penalty": "l2"
+    },
+    "rf": {
+      "n_estimators": 800,
+      "min_samples_split": 10,
+      "min_samples_leaf": 2,
+      "max_features": "log2",
+      "max_depth": 3,
+      "criterion": "entropy",
+      "class_weight": "balanced",
+      "bootstrap": false
+    },
+    "xgb": {
+      "subsample": 0.9,
+      "reg_lambda": 5,
+      "reg_alpha": 0.001,
+      "n_estimators": 100,
+      "min_child_weight": 3,
+      "max_depth": 2,
+      "learning_rate": 0.05,
+      "gamma": 1,
+      "colsample_bytree": 1.0
+    }
+  },
+  "wdbc": {
+    "lr": {
+      "C": 0.1,
+      "class_weight": "balanced",
+      "penalty": "l2"
+    },
+    "rf": {
+      "n_estimators": 800,
+      "min_samples_split": 2,
+      "min_samples_leaf": 2,
+      "max_features": "log2",
+      "max_depth": 8,
+      "criterion": "gini",
+      "class_weight": "balanced",
+      "bootstrap": false
+    },
+    "xgb": {
+      "subsample": 0.9,
+      "reg_lambda": 10,
+      "reg_alpha": 1,
+      "n_estimators": 500,
+      "min_child_weight": 1,
+      "max_depth": 5,
+      "learning_rate": 0.05,
+      "gamma": 0.25,
+      "colsample_bytree": 1.0
+    }
+  }
+}

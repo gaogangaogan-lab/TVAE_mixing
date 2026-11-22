@@ -1,0 +1,7 @@
+root,dataset,purpose,classifier,level,class,batch,seed
+100,pima,tvae_fit,none,,none,0,2890836806
+100,pima,pool_sample,none,,none,0,1389643679
+100,pima,pool_sample,none,,none,1,3844930949
+100,pima,pool_sample,none,,none,2,3212883872
+100,pima,pool_sample,none,,none,3,802251663
+100,pima,pool_sample,none,,none,4,532371561

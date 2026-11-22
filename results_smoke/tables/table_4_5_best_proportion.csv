@@ -1,0 +1,7 @@
+Dataset,Classifier,Best Proportion (Mean F1),F1 at Best,F1 at 0%,Near-Maximum Band,Best Proportion in Runs
+Cleveland,LR,"10%, 20%, 30%",0.897,0.867,,r100: 10%/20%/30%
+Cleveland,RF,"10%, 20%",0.897,0.881,,r100: 10%/20%
+Cleveland,XGBoost,10%,0.897,0.877,,r100: 10%
+WDBC,LR,0%,0.988,0.988,,r100: 0%
+WDBC,RF,0%,0.963,0.963,,r100: 0%
+WDBC,XGBoost,20%,0.963,0.950,,r100: 20%

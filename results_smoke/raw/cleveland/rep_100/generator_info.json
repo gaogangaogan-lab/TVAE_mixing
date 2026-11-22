@@ -1,0 +1,72 @@
+{
+  "generator": "tvae",
+  "fit_seconds": 0.4,
+  "epochs": 5,
+  "batch_sizes_per_epoch": [
+    242
+  ],
+  "ctgan_keeps_last_batch": true,
+  "metadata": {
+    "tables": {
+      "data": {
+        "columns": {
+          "age": {
+            "sdtype": "numerical"
+          },
+          "sex": {
+            "sdtype": "categorical"
+          },
+          "cp": {
+            "sdtype": "categorical"
+          },
+          "trestbps": {
+            "sdtype": "numerical"
+          },
+          "chol": {
+            "sdtype": "numerical"
+          },
+          "fbs": {
+            "sdtype": "categorical"
+          },
+          "restecg": {
+            "sdtype": "categorical"
+          },
+          "thalach": {
+            "sdtype": "numerical"
+          },
+          "exang": {
+            "sdtype": "categorical"
+          },
+          "oldpeak": {
+            "sdtype": "numerical"
+          },
+          "slope": {
+            "sdtype": "categorical"
+          },
+          "ca": {
+            "sdtype": "categorical"
+          },
+          "thal": {
+            "sdtype": "categorical"
+          },
+          "target": {
+            "sdtype": "categorical"
+          }
+        }
+      }
+    },
+    "relationships": [],
+    "METADATA_SPEC_VERSION": "V1"
+  },
+  "pool": {
+    "batch_size": 2420,
+    "batches_drawn": 1,
+    "success": true,
+    "pool_size": 2420,
+    "pool_neg": 1938,
+    "pool_pos": 482,
+    "pool_pos_share": 0.19917355371900827,
+    "other_target_values": 0,
+    "duplicate_rows_within_pool": 0
+  }
+}

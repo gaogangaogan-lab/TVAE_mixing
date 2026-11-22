@@ -1,0 +1,31 @@
+{
+  "source": "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data (downloaded)",
+  "split_counts_train_neg_pos_test_neg_pos": [
+    131,
+    111,
+    33,
+    28
+  ],
+  "matches_table_3_3": true,
+  "imputation_constants": {
+    "ca": 0.0,
+    "thal": 3.0
+  },
+  "continuous": [
+    "age",
+    "trestbps",
+    "chol",
+    "thalach",
+    "oldpeak"
+  ],
+  "discrete": [
+    "sex",
+    "cp",
+    "fbs",
+    "restecg",
+    "exang",
+    "slope",
+    "ca",
+    "thal"
+  ]
+}

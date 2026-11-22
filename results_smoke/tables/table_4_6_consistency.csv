@@ -1,0 +1,7 @@
+Dataset,Classifier,Best Proportion,Run 1 at best,Run 1 at 0%,Paired Differences (Best minus 0%),Mean Difference (SD),Runs Positive / Zero / Negative,Note
+Cleveland,LR,10%,0.8966,0.8667,+0.0299,0.0299,1 / 0 / 0,
+Cleveland,RF,10%,0.8966,0.8814,+0.0152,0.0152,1 / 0 / 0,
+Cleveland,XGBoost,10%,0.8966,0.8772,+0.0194,0.0194,1 / 0 / 0,
+WDBC,LR,0%,0.988,0.988,+0.0000,0.0000,0 / 1 / 0,best is the 0% baseline: no evidence of a gain from mixing
+WDBC,RF,0%,0.963,0.963,+0.0000,0.0000,0 / 1 / 0,best is the 0% baseline: no evidence of a gain from mixing
+WDBC,XGBoost,20%,0.963,0.95,+0.0130,0.0130,1 / 0 / 0,

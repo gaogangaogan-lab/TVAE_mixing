@@ -1,0 +1,4 @@
+dataset,rep,status
+cleveland,100,ok
+pima,100,generation_failure
+wdbc,100,ok

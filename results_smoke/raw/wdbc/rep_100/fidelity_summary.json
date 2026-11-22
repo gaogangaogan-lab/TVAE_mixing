@@ -1,0 +1,12 @@
+{
+  "dataset": "wdbc",
+  "rep": 100,
+  "continuous_mean": 0.6973626373626376,
+  "discrete_mean": NaN,
+  "combined_predictors": 0.6973626373626376,
+  "n_predictors": 30,
+  "target_check": 1.0,
+  "pool_neg": 4201,
+  "pool_pos": 349,
+  "pool_pos_share": 0.0767032967032967
+}
