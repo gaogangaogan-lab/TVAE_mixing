@@ -1,7 +1,0 @@
-Dataset,Classifier,F1 at 0%,F1 at 100%,"100% minus 0% (paired, mean (SD))",First level below 0% mean - SD,Levels below 0% mean - SD,Adjacent increases / decreases (of 10),Largest single drop (between),Range of means (max - min)
-Cleveland,LR,0.8667,0.3077,-0.5590,none,,2 / 6,90%-100% (-0.3105),0.5889
-Cleveland,RF,0.8814,0.25,-0.6314,none,,3 / 5,90%-100% (-0.4670),0.6466
-Cleveland,XGBoost,0.8772,0.2162,-0.6610,none,,4 / 6,90%-100% (-0.4505),0.6803
-WDBC,LR,0.988,0.5806,-0.4073,none,,1 / 6,90%-100% (-0.3329),0.4073
-WDBC,RF,0.963,0.0851,-0.8779,none,,2 / 7,90%-100% (-0.8240),0.8779
-WDBC,XGBoost,0.95,0.1277,-0.8223,none,,2 / 6,90%-100% (-0.7671),0.8353

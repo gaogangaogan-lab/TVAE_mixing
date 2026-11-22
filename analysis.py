@@ -376,7 +376,10 @@ def fig_main(agg, path):
         ax.set_xticklabels([f"{v}" for v in x])
         ax.set_xlabel("Mixing proportion (% synthetic)")
     axes[0].set_ylabel("F1-score (mean ± SD over runs)")
-    axes[0].legend(frameon=False, loc="lower left")
+    for ax in axes:
+        if ax.get_legend_handles_labels()[0]:
+            ax.legend(frameon=False, loc="lower left")
+            break
     fig.tight_layout()
     fig.savefig(path, dpi=300)
     plt.close(fig)
@@ -398,7 +401,8 @@ def fig_ablation(agg, d, path):
         ax.set_xticks(x)
         ax.set_xlabel("Matched mixing level (% synthetic)")
     axes[0].set_ylabel("F1-score (mean ± SD)")
-    handles, labels = axes[0].get_legend_handles_labels()
+    handles, labels = next((a.get_legend_handles_labels() for a in axes
+                            if a.get_legend_handles_labels()[0]), ([], []))
     fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.5, 1.02))
     fig.tight_layout(rect=(0, 0, 1, 0.92))
     fig.savefig(path, dpi=300)

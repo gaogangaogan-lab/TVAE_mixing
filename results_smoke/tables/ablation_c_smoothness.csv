@@ -1,7 +1,0 @@
-Dataset,Classifier,Per-level SD 10-90% (nested),Per-level SD 10-90% (independent),Mean |adjacent change| (nested),Mean |adjacent change| (independent),SD of adjacent change (nested),SD of adjacent change (independent)
-Cleveland,LR,,,0.065,0.069,,
-Cleveland,RF,,,0.0742,0.0805,,
-Cleveland,XGBoost,,,0.0781,0.0672,,
-WDBC,LR,,,0.0454,0.0575,,
-WDBC,RF,,,0.0929,0.1025,,
-WDBC,XGBoost,,,0.0876,0.0853,,

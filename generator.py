@@ -35,13 +35,15 @@ def build_metadata(df, spec):
         md = SingleTableMetadata()
         md.detect_from_dataframe(df)
     # Never let auto-detection create a primary key or id column
-    for remover in ("remove_primary_key",):
-        if hasattr(md, remover):
+    import warnings as _w
+    with _w.catch_warnings():
+        _w.simplefilter("ignore")
+        if hasattr(md, "remove_primary_key"):
             try:
-                getattr(md, remover)(table_name=TABLE)
+                md.remove_primary_key(table_name=TABLE)
             except TypeError:
                 try:
-                    getattr(md, remover)()
+                    md.remove_primary_key()
                 except Exception:
                     pass
             except Exception:

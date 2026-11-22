@@ -1,5 +1,5 @@
 {
-  "source": "https://archive.ics.uci.edu/ml/machine-learning-databases/heart-disease/processed.cleveland.data (downloaded)",
+  "source": "data\\processed.cleveland.data",
   "split_counts_train_neg_pos_test_neg_pos": [
     131,
     111,

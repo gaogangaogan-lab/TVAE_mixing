@@ -114,4 +114,5 @@ SETTING_NAMES = {
 }
 
 # Smoke-test overrides (pipeline check only, NOT for reported results)
-SMOKE = {"epochs": 5, "n_iter": {"rf": 4, "xgb": 4}, "lr_grid_small": True}
+SMOKE = {"epochs": None,  # full 300 epochs: TVAE fits in seconds, and 5 epochs left Pima's pool almost without positives
+          "n_iter": {"rf": 4, "xgb": 4}, "lr_grid_small": True}

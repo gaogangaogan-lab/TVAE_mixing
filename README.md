@@ -24,7 +24,7 @@ pip install -r requirements.txt
 # 第 0 步：检查环境、数据、划分是否与 Table 3.3 一致，分配是否与 Table A.1 一致
 python run.py check
 
-# 第 1 步：冒烟测试（5 个 epoch、极小的超参搜索、1 次重复），只验证流程能跑通，结果不能用于报告
+# 第 1 步：冒烟测试（TVAE 照常训练 300 个 epoch，超参只搜几个候选，只跑 1 次重复），只验证流程能跑通，结果不能用于报告
 python run.py all --smoke
 
 # 第 2 步：超参数重新搜索（Section 3.7，插补/标准化放在 CV 折内）

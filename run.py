@@ -6,7 +6,7 @@
   python run.py analyze                    # Chapter 4 tables and figures
   python run.py all                        # tune -> experiment -> analyze
 
-  add --smoke for a quick end-to-end check (5 TVAE epochs, tiny search,
+  add --smoke for a quick end-to-end check (full TVAE, tiny search,
   one repetition, separate output folder). Smoke results are NOT for the report.
 """
 import os
@@ -26,6 +26,10 @@ import config
 
 # sklearn >= 1.8 deprecates 'penalty' (still valid until 1.10); keep the log readable
 warnings.filterwarnings("ignore", message=".*'penalty' was deprecated.*", category=FutureWarning)
+# Harmless: XGBoost trains on the GPU and predicts on CPU arrays (results identical)
+warnings.filterwarnings("ignore", message=".*Falling back to prediction using DMatrix.*")
+# SDV advice; the metadata is already archived in generator_info.json
+warnings.filterwarnings("ignore", message=".*saving the metadata using 'save_to_json'.*")
 
 
 def detect_device(requested):
