@@ -1,6 +1,6 @@
 # TVAE 固定预算混合实验代码
 
-这套代码按报告第 3 章的设计实现：主实验 S0–S10 加上消融 B、C，5 次重复（root seed 100–104），最后输出第 4 章的表和图。
+这套代码按报告第 3 章的设计实现：主实验 S0–S10 加上两个消融（报告里的 Ablation A 和 Ablation B），5 次重复（root seed 100–104），最后输出第 4 章的表和图。
 
 ## 1. 环境
 
@@ -53,7 +53,7 @@ results/
                                seeds.csv、fidelity_*.json/csv、metrics.csv、
                                test_probabilities.npz、generator_info.json
   tables/                      第 4 章各表（CSV + all_tables.xlsx）
-  figures/                     主轨迹三联图、各数据集消融对比图、RQ3 散点图
+  figures/                     各数据集的主轨迹图、复现图、两个消融的对比图、RQ3 图
 ```
 
 `tables/` 的内容（发现 / 验证口径）：
@@ -65,23 +65,23 @@ results/
 | rq2_replication_main | RQ2：该比例在 seed 101–104 中相对 0% 的差值、高/平/低次数、是否全部复现 |
 | rq2_per_level_above_baseline | 每个固定比例在验证运行中高于 0% 的次数 |
 | rq2_best_mixed_vs_baseline | 每次验证运行里"最好的混合比例"对 0%（仅作描述，有挑最大值的偏差） |
-| ablation_replication_all_settings / ablation_count_summary | 主实验、B、C 用同一规则的结果，以及每个设置有几个组合全部复现 |
-| ablation_per_level_vs_main | B、C 在每个比例上和主实验的配对差（5 次） |
-| ablation_b_class_shares / ablation_b_confusion | B 的类别漂移和混淆矩阵 |
-| ablation_c_smoothness | 嵌套与独立抽样的平滑度 |
+| ablation_replication_all_settings / ablation_count_summary | 主实验和两个消融用同一规则的结果，以及每个设置有几个组合全部复现 |
+| ablation_per_level_vs_main | 两个消融在每个比例上和主实验的配对差（5 次） |
+| ablation_b_class_shares / ablation_b_confusion | Ablation A 的类别漂移和混淆矩阵 |
+| ablation_c_smoothness | Ablation B：嵌套与独立抽样的平滑度 |
 | rq3_fidelity_by_variable / rq3_fidelity_f1_pairs / rq3_trend_by_fidelity / rq3_descriptive | RQ3：100% 时的保真度与 F1（5 次） |
 | context_mean_sd_all_runs | 5 次的均值（SD），只用来说明波动 |
 | supporting_metrics_all_settings | 辅助指标和混淆矩阵计数 |
 
-`figures/`：fig_rq1_discovery_trajectories、fig_rq2_replication、fig_rq2_per_level_above_baseline、fig_ablation_replication、fig_variability_<数据集>、fig_rq3_trend_by_fidelity、fig_rq3_scatter、fig_rq3_variable_fidelity、fig_rq3_ranges。
+`figures/`：fig_rq1_discovery_<数据集>、fig_rq2_replication、fig_rq2_per_level_above_baseline、fig_ablation_a、fig_ablation_b、fig_variability_<数据集>、fig_rq3_trend_by_fidelity、fig_rq3_scatter、fig_rq3_variable_fidelity、fig_rq3_ranges。
 
-消融只保留 B 和 C（Ablation A 已从设计中删除，因为它改变训练集大小，和主实验不可比）。旧结果里的 A 数据会被分析自动忽略，不需要重跑实验。
+结果文件里的 setting 字段沿用内部代号：`B` 是报告里的 Ablation A（取消按类分配），`C` 是报告里的 Ablation B（取消嵌套）。表和图上显示的都是报告里的名字。
 
 ## 5. 每次重复都会自动检查的性质（Section 4.2）
 
-- main 和 C 在每个比例下总量都是 N，类别总数不变，合成数据的类别计数与分配规则一致
-- A 的总量等于 N+M；B 的总量等于 N
-- main、A、B 在相邻比例之间，真实部分和合成部分都满足嵌套
+- main 和 C（Ablation B）在每个比例下总量都是 N，类别总数不变，合成数据的类别计数与分配规则一致
+- B（Ablation A）的总量等于 N
+- main 和 B（Ablation A）在相邻比例之间，真实部分和合成部分都满足嵌套
 - 同一个训练集里不会出现重复的记录 id
 
 任意一条不满足时，程序会直接报错停止，不会产出有问题的结果。

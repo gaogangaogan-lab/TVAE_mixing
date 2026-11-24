@@ -159,7 +159,7 @@ def check_properties(sets, real_y, pool_y):
             s = sets[(st, k)]
             if len(np.unique(s.real_ids)) != len(s.real_ids) or len(np.unique(s.syn_ids)) != len(s.syn_ids):
                 problems.append(f"{st} L{k}: repeated record ids")
-    # nesting of main / A / B components between adjacent levels
+    # nesting of the main and unstratified (B) components between adjacent levels
     for st in ("main", "B"):
         for k in config.LEVELS[:-1]:
             s0, s1 = sets[(st, k)], sets[(st, k + 1)]

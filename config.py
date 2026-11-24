@@ -108,13 +108,15 @@ THESIS_TABLE_3_8 = {
 # Settings (Table 3.1)
 # ---------------------------------------------------------------------------
 SETTINGS = ["main", "B", "C"]
+# Display names used in tables and figures. The internal keys "B" and "C" are kept
+# so that stored results stay readable: "B" is Ablation A in the report
+# (unstratified replacement) and "C" is Ablation B (independent draws).
 SETTING_NAMES = {
     "main": "Main (fixed-budget mixing)",
-    "B": "Ablation B (unstratified)",
-    "C": "Ablation C (independent draws)",
+    "B": "Ablation A (unstratified)",
+    "C": "Ablation B (independent draws)",
 }
-# Ablation A (augmentation) was dropped from the design: it changes the training-set
-# size, so its comparison with the fixed-budget main setting is not like-for-like.
+SETTING_SHORT = {"main": "Main", "B": "Abl. A", "C": "Abl. B"}
 
 # Smoke-test overrides (pipeline check only, NOT for reported results)
 SMOKE = {"epochs": None,  # full 300 epochs: TVAE fits in seconds, and 5 epochs left Pima's pool almost without positives

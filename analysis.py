@@ -6,8 +6,10 @@ RQ1  The highest-F1 mixing proportion is identified in ONE run, the discovery ru
 RQ2  That proportion is checked in the replication runs (seeds 101-104): in each
      run, F1 at that proportion minus F1 at 0% in the same run. A gain counts as
      replicated only if the difference is positive in every replication run.
-Abl. Ablations B and C are read with exactly the same rule; the summary counts
+Abl. The two ablations are read with exactly the same rule; the summary counts
      how many of the nine combinations show a replicated gain per setting.
+     Internal setting keys: "B" = Ablation A in the report (unstratified),
+     "C" = Ablation B in the report (independent draws); see config.SETTING_NAMES.
 RQ3  100% mixing only, all five runs: predictor-based fidelity vs F1.
 
 Everything is descriptive; no significance tests. Means/SDs over the five runs
@@ -57,7 +59,7 @@ def load(out_dir):
     if not metrics:
         raise SystemExit(f"No finished repetitions found under {raw}")
     df = pd.concat(metrics, ignore_index=True)
-    df = df[df.setting.isin(config.SETTINGS)]       # older runs may still hold Ablation A rows
+    df = df[df.setting.isin(config.SETTINGS)]       # keep only the settings of the current design
     return df, pd.concat(fid_vars, ignore_index=True), pd.DataFrame(fid_sum), pd.DataFrame(status)
 
 
@@ -203,7 +205,7 @@ def best_mixed_vs_baseline(df):
 
 
 # ---------------------------------------------------------------------------
-# Ablations B and C
+# Ablations (internal keys B and C)
 # ---------------------------------------------------------------------------
 def ablation_count_summary(rep_tables):
     rows = []
@@ -252,7 +254,7 @@ def ablation_b_class_shares(df):
 
 def ablation_b_confusion(df, rep_tables):
     """Confusion counts (mean over replication runs) at the discovery proportion,
-    main vs Ablation B, to see how class drift changes the predictions."""
+    main vs the unstratified ablation (key B), to see how class drift changes the predictions."""
     rows = []
     rev = {v: k for k, v in DS_NAMES.items()}
     revc = {v: k for k, v in config.CLASSIFIER_NAMES.items()}
@@ -393,6 +395,17 @@ def _plt():
     return plt
 
 
+def _run_handles(color="#333333", marker="o"):
+    """Legend entries explaining hollow (discovery) vs filled (replication) marks."""
+    from matplotlib.lines import Line2D
+    return ([Line2D([], [], ls="", marker=marker, ms=8, mfc="none", mec=color, mew=1.5),
+             Line2D([], [], ls="", marker=marker, ms=5.5, color=color, mec="white")],
+            [f"Discovery run (seed {DISC})", f"Replication runs (seeds {REPL[0]}-{REPL[-1]})"])
+
+
+NO_CANDIDATE = "No candidate\n(0% highest)"
+
+
 def _legend_first(axes, **kw):
     for ax in np.ravel(axes):
         if ax.get_legend_handles_labels()[0]:
@@ -400,116 +413,118 @@ def _legend_first(axes, **kw):
             return
 
 
-def fig_rq1(df, path):
-    """Discovery-run trajectories; the identified proportion is ringed."""
+def fig_rq1(df, d, path):
+    """Discovery-run trajectories of one dataset; the highest-F1 proportion is ringed."""
     plt = _plt()
-    fig, axes = plt.subplots(1, 3, figsize=(11, 3.5))
+    from matplotlib.lines import Line2D
+    fig, ax = plt.subplots(figsize=(6.4, 3.6))
     x = np.array(config.LEVELS) * 10
-    for ax, d in zip(axes, DS_ORDER):
-        for i, c in enumerate(config.CLASSIFIERS):
-            piv = _pivot(df, d, c, "main")
-            if DISC not in piv.index:
-                continue
-            r = piv.loc[DISC]
-            best, _ = discovery_best(r)
-            ax.plot(x, r.to_numpy(), color=SERIES_COLORS[i], marker=MARKERS[i], ms=5, lw=2,
-                    label=config.CLASSIFIER_NAMES[c])
-            ax.scatter([best * 10], [r[best]], s=170, facecolors="none", edgecolors=SERIES_COLORS[i],
-                       linewidths=1.8, zorder=4)
-        ax.set_title(f"{DS_NAMES[d]} (seed {DISC})")
-        ax.set_xticks(x)
-        ax.set_xlabel("Mixing proportion (% synthetic)")
-    axes[0].set_ylabel("F1-score (discovery run)")
-    _legend_first(axes, loc="lower left")
-    fig.text(0.5, -0.02, "Ring = highest-F1 proportion (ties with 0% resolved to the mixed proportion)",
-             ha="center", fontsize=8, color=MUTED)
+    for i, c in enumerate(config.CLASSIFIERS):
+        piv = _pivot(df, d, c, "main")
+        if DISC not in piv.index:
+            continue
+        r = piv.loc[DISC]
+        best, _ = discovery_best(r)
+        ax.plot(x, r.to_numpy(), color=SERIES_COLORS[i], marker=MARKERS[i], ms=5, lw=2,
+                label=config.CLASSIFIER_NAMES[c])
+        ax.scatter([best * 10], [r[best]], s=190, facecolors="none", edgecolors=SERIES_COLORS[i],
+                   linewidths=1.8, zorder=4)
+    ax.set_xticks(x)
+    ax.set_xlabel("Mixing proportion (% synthetic)")
+    ax.set_ylabel(f"F1-score (discovery run, seed {DISC})")
+    h, l = ax.get_legend_handles_labels()
+    h.append(Line2D([], [], ls="", marker="o", ms=11, mfc="none", mec="#333333", mew=1.6))
+    l.append("Highest F1 of the classifier")
+    ax.legend(h, l, frameon=False, fontsize=8, loc="upper center", bbox_to_anchor=(0.5, 1.2), ncol=4)
     fig.tight_layout()
     fig.savefig(path, dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 
-def fig_replication(rep_tables, settings, path, title_suffix=""):
-    """Dot plot: F1 at the discovery proportion minus F1 at 0%, one dot per run."""
+def fig_replication(rep_tables, path):
+    """Main setting: F1 at the discovery proportion minus F1 at 0%, one dot per run."""
     plt = _plt()
-    fig, axes = plt.subplots(1, 3, figsize=(11, 3.6), sharey=True)
+    t = rep_tables["main"]
+    fig, axes = plt.subplots(1, 3, figsize=(11, 3.7), sharey=True)
     for ax, d in zip(axes, DS_ORDER):
         ax.axhline(0, color="#333333", lw=1)
         labels = []
         for ci, c in enumerate(config.CLASSIFIERS):
-            for si, st in enumerate(settings):
-                t = rep_tables[st]
-                r = t[(t.Dataset == DS_NAMES[d]) & (t.Classifier == config.CLASSIFIER_NAMES[c])]
-                if r.empty:
-                    continue
-                r = r.iloc[0]
-                xpos = ci + (si - (len(settings) - 1) / 2) * 0.26
-                if r["Discovery Proportion"] == "0%":
-                    ax.text(xpos, 0.002, "0%\nhighest", ha="center", va="bottom", fontsize=6.5, color=MUTED)
-                    continue
-                vals = [r[f"Seed {s}"] for s in REPL if f"Seed {s}" in r and r[f"Seed {s}"] != ""]
-                step = 0.045 if len(settings) == 1 else 0.035
-                offs = (np.arange(len(vals)) - (len(vals) - 1) / 2) * step
-                ax.scatter(xpos + offs, vals, s=34, color=SERIES_COLORS[si], marker=MARKERS[si],
-                           edgecolor="white", linewidth=1.2, zorder=3,
-                           label=config.SETTING_NAMES[st] if (d == DS_ORDER[0] and ci == 0) else None)
-                ax.scatter([xpos], [r["Discovery Gain"]], s=60, facecolors="none",
-                           edgecolors=SERIES_COLORS[si], marker=MARKERS[si], linewidths=1.4, zorder=3)
-                ax.text(xpos, -0.079, r["Discovery Proportion"],
-                        ha="center", fontsize=6.5, color=MUTED)
-            labels.append(config.CLASSIFIER_NAMES[c])
+            r = t[(t.Dataset == DS_NAMES[d]) & (t.Classifier == config.CLASSIFIER_NAMES[c])]
+            name = config.CLASSIFIER_NAMES[c]
+            if r.empty:
+                labels.append(name)
+                continue
+            r = r.iloc[0]
+            if r["Discovery Proportion"] == "0%":
+                labels.append(name)
+                ax.text(ci, 0.004, NO_CANDIDATE, ha="center", va="bottom", fontsize=7, color=MUTED)
+                continue
+            labels.append(f"{name}\n({r['Discovery Proportion']})")
+            vals = [r[f"Seed {s}"] for s in REPL if f"Seed {s}" in r and r[f"Seed {s}"] != ""]
+            offs = (np.arange(len(vals)) - (len(vals) - 1) / 2) * 0.07
+            ax.scatter(ci + offs, vals, s=34, color=SERIES_COLORS[0], marker=MARKERS[0],
+                       edgecolor="white", linewidth=1.2, zorder=3)
+            ax.scatter([ci], [r["Discovery Gain"]], s=80, facecolors="none",
+                       edgecolors=SERIES_COLORS[0], marker=MARKERS[0], linewidths=1.5, zorder=4)
         ax.set_xticks(range(len(config.CLASSIFIERS)))
         ax.set_xticklabels(labels)
         ax.set_xlim(-0.6, len(config.CLASSIFIERS) - 0.4)
-        ax.set_title(DS_NAMES[d] + title_suffix)
-    axes[0].set_ylabel("F1 at discovery proportion minus F1 at 0%")
+        ax.set_title(DS_NAMES[d])
+    axes[0].set_ylabel("F1 at candidate proportion\nminus F1 at 0% (same run)")
     axes[0].set_ylim(-0.085, 0.06)
-    if len(settings) > 1:
-        _legend_first(axes, loc="upper left", fontsize=7.5)
-    fig.text(0.5, -0.03, f"Filled = replication runs (seeds {REPL[0]}-{REPL[-1]}); hollow = discovery run "
-             f"(seed {DISC}); grey label = proportion tested", ha="center", fontsize=8, color=MUTED)
+    h, l = _run_handles(SERIES_COLORS[0], MARKERS[0])
+    fig.legend(h, l, loc="upper center", ncol=2, frameon=False, bbox_to_anchor=(0.5, 1.06))
     fig.tight_layout()
     fig.savefig(path, dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 
-def fig_ablation_grid(rep_tables, path):
-    """3 x 3 grid (dataset x classifier); x = setting. Same reading as the RQ2 figure."""
+def fig_ablation(rep_tables, ablation, path):
+    """3 x 3 grid (dataset x classifier); main setting vs one ablation, same reading as the RQ2 figure."""
     plt = _plt()
-    fig, axes = plt.subplots(3, 3, figsize=(10, 8.6), sharey=True)
+    from matplotlib.lines import Line2D
+    settings = ["main", ablation]
+    sidx = {st: config.SETTINGS.index(st) for st in settings}
+    fig, axes = plt.subplots(3, 3, figsize=(9, 8.6), sharey=True)
     for i, d in enumerate(DS_ORDER):
         for j, c in enumerate(config.CLASSIFIERS):
             ax = axes[i, j]
             ax.axhline(0, color="#333333", lw=1)
             ticks = []
-            for si, st in enumerate(config.SETTINGS):
+            for xi, st in enumerate(settings):
                 t = rep_tables[st]
                 r = t[(t.Dataset == DS_NAMES[d]) & (t.Classifier == config.CLASSIFIER_NAMES[c])]
-                short = {"main": "Main", "B": "B", "C": "C"}[st]
+                short = config.SETTING_SHORT[st]
                 if r.empty:
                     ticks.append(short)
                     continue
                 r = r.iloc[0]
-                ticks.append(f"{short}\n{r['Discovery Proportion']}")
+                k = sidx[st]
                 if r["Discovery Proportion"] == "0%":
-                    ax.text(si, 0.004, "0%\nhighest", ha="center", va="bottom", fontsize=7, color=MUTED)
+                    ticks.append(short)
+                    ax.text(xi, 0.004, NO_CANDIDATE, ha="center", va="bottom", fontsize=7, color=MUTED)
                     continue
+                ticks.append(f"{short}\n{r['Discovery Proportion']}")
                 vals = [r[f"Seed {s}"] for s in REPL if r[f"Seed {s}"] != ""]
                 offs = (np.arange(len(vals)) - (len(vals) - 1) / 2) * 0.09
-                ax.scatter(si + offs, vals, s=30, color=SERIES_COLORS[si], marker=MARKERS[si],
+                ax.scatter(xi + offs, vals, s=30, color=SERIES_COLORS[k], marker=MARKERS[k],
                            edgecolor="white", linewidth=1.0, zorder=3)
-                ax.scatter([si], [r["Discovery Gain"]], s=75, facecolors="none",
-                           edgecolors=SERIES_COLORS[si], marker=MARKERS[si], linewidths=1.5, zorder=4)
+                ax.scatter([xi], [r["Discovery Gain"]], s=80, facecolors="none",
+                           edgecolors=SERIES_COLORS[k], marker=MARKERS[k], linewidths=1.5, zorder=4)
                 if r["Replicated in All Runs"] == "yes":
-                    ax.text(si, 0.052, "all 4\nabove", ha="center", fontsize=7, color="#333333")
-            ax.set_xticks(range(len(config.SETTINGS)))
-            ax.set_xticklabels(ticks, fontsize=7.5)
-            ax.set_xlim(-0.6, len(config.SETTINGS) - 0.4)
+                    ax.text(xi, 0.05, "above 0% in\nall four runs", ha="center", fontsize=7, color="#333333")
+            ax.set_xticks(range(len(settings)))
+            ax.set_xticklabels(ticks, fontsize=8)
+            ax.set_xlim(-0.6, len(settings) - 0.4)
             ax.set_title(f"{DS_NAMES[d]} - {config.CLASSIFIER_NAMES[c]}", fontsize=9)
             if j == 0:
-                ax.set_ylabel("F1 minus F1 at 0%")
-    axes[0, 0].set_ylim(-0.08, 0.068)
-    fig.text(0.5, -0.01, f"Filled = replication runs (seeds {REPL[0]}-{REPL[-1]}); hollow = discovery run (seed {DISC}); "
-             "tick label = setting and the proportion tested", ha="center", fontsize=8, color=MUTED)
+                ax.set_ylabel("F1 minus F1 at 0%\n(same run)")
+    axes[0, 0].set_ylim(-0.08, 0.07)
+    h = [Line2D([], [], ls="", marker=MARKERS[sidx[st]], ms=7, color=SERIES_COLORS[sidx[st]]) for st in settings]
+    l = [config.SETTING_NAMES[st] for st in settings]
+    hr, lr = _run_handles()
+    fig.legend(h + hr, l + lr, loc="upper center", ncol=2, frameon=False, bbox_to_anchor=(0.5, 1.05), fontsize=8.5)
     fig.tight_layout()
     fig.savefig(path, dpi=300, bbox_inches="tight")
     plt.close(fig)
@@ -537,9 +552,8 @@ def fig_per_level(df, path):
         ax.text(xi, n + 0.4, str(n), ha="center", fontsize=8)
     ax.set_xticks(x)
     ax.set_xlabel("Mixing proportion (% synthetic)")
-    ax.set_ylabel(f"Runs above 0% (of {total})")
+    ax.set_ylabel(f"Replication runs above 0%\n(of {total}, all nine combinations)")
     ax.set_ylim(0, total * 0.6)
-    ax.set_title("Replication runs in which a fixed proportion beats the 0% baseline")
     fig.tight_layout()
     fig.savefig(path, dpi=300)
     plt.close(fig)
@@ -675,11 +689,11 @@ def fig_rq3_ranges(desc, path):
         r = desc[(desc.Dataset == DS_NAMES[d]) & (desc.Classifier == config.CLASSIFIER_NAMES[c])]
         fr.append(float(r["Fidelity Range"].iloc[0]) if len(r) else np.nan)
         yr.append(float(r["F1 Range"].iloc[0]) if len(r) else np.nan)
-    ax.bar(x - 0.2, fr, width=0.38, color=MUTED, label="Fidelity range")
-    ax.bar(x + 0.2, yr, width=0.38, color=SERIES_COLORS[0], label="F1 range (100% mixing)")
+    ax.bar(x - 0.2, fr, width=0.38, color=MUTED, label="Fidelity range (shared by the classifiers of a dataset)")
+    ax.bar(x + 0.2, yr, width=0.38, color=SERIES_COLORS[0], label="F1-score range at 100% mixing")
     ax.set_xticks(x)
     ax.set_xticklabels([f"{DS_NAMES[d]}\n{config.CLASSIFIER_NAMES[c]}" for d, c in groups], fontsize=7.5)
-    ax.set_ylabel("Max minus min over five runs")
+    ax.set_ylabel("Range over five runs\n(maximum minus minimum,\nscores on a 0-1 scale)")
     ax.legend(frameon=False, loc="upper left")
     fig.tight_layout()
     fig.savefig(path, dpi=300)
@@ -736,10 +750,13 @@ def run_analysis(out_dir):
 
     for old in glob.glob(os.path.join(fdir, "fig_*.png")):
         os.remove(old)
-    fig_rq1(df, os.path.join(fdir, "fig_rq1_discovery_trajectories.png"))
-    fig_replication(rep_tables, ["main"], os.path.join(fdir, "fig_rq2_replication.png"))
+    for d in DS_ORDER:
+        if (df.dataset == d).any():
+            fig_rq1(df, d, os.path.join(fdir, f"fig_rq1_discovery_{d}.png"))
+    fig_replication(rep_tables, os.path.join(fdir, "fig_rq2_replication.png"))
     fig_per_level(df, os.path.join(fdir, "fig_rq2_per_level_above_baseline.png"))
-    fig_ablation_grid(rep_tables, os.path.join(fdir, "fig_ablation_replication.png"))
+    fig_ablation(rep_tables, "B", os.path.join(fdir, "fig_ablation_a.png"))
+    fig_ablation(rep_tables, "C", os.path.join(fdir, "fig_ablation_b.png"))
     for d in DS_ORDER:
         if (df.dataset == d).any():
             fig_variability(df, d, os.path.join(fdir, f"fig_variability_{d}.png"))
