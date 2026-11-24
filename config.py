@@ -12,6 +12,8 @@ CV_SEED = 42               # StratifiedKFold shuffling in the hyperparameter sea
 SEARCH_SEED = 2026         # RandomizedSearchCV candidate sampling (recorded, separate from repetitions)
 SEARCH_CLF_SEED = 42       # random_state of stochastic classifiers inside CV
 ROOT_SEEDS = [100, 101, 102, 103, 104]
+DISCOVERY_SEED = 100              # RQ1: the highest-F1 proportion is found in this run
+REPLICATION_SEEDS = [101, 102, 103, 104]   # RQ2: is that proportion still above 0% here?
 TEST_SIZE = 0.2
 N_LEVELS = 11              # 0%, 10%, ..., 100%
 LEVELS = list(range(N_LEVELS))  # level k means nominal proportion k/10
@@ -105,13 +107,14 @@ THESIS_TABLE_3_8 = {
 # ---------------------------------------------------------------------------
 # Settings (Table 3.1)
 # ---------------------------------------------------------------------------
-SETTINGS = ["main", "A", "B", "C"]
+SETTINGS = ["main", "B", "C"]
 SETTING_NAMES = {
     "main": "Main (fixed-budget mixing)",
-    "A": "Ablation A (augmentation)",
     "B": "Ablation B (unstratified)",
     "C": "Ablation C (independent draws)",
 }
+# Ablation A (augmentation) was dropped from the design: it changes the training-set
+# size, so its comparison with the fixed-budget main setting is not like-for-like.
 
 # Smoke-test overrides (pipeline check only, NOT for reported results)
 SMOKE = {"epochs": None,  # full 300 epochs: TVAE fits in seconds, and 5 epochs left Pima's pool almost without positives
