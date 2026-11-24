@@ -1,6 +1,6 @@
 # TVAE 固定预算混合实验代码
 
-这套代码按报告第 3 章的设计实现：主实验 S0–S10 加上消融 A、B、C，5 次重复（root seed 100–104），最后输出第 4 章的表和图。
+这套代码按报告第 3 章的设计实现：主实验 S0–S10 加上消融 B、C，5 次重复（root seed 100–104），最后输出第 4 章的表和图。
 
 ## 1. 环境
 
@@ -56,22 +56,26 @@ results/
   figures/                     主轨迹三联图、各数据集消融对比图、RQ3 散点图
 ```
 
-`tables/` 与报告的对应关系：
+`tables/` 的内容（发现 / 验证口径）：
 
-| 文件 | 对应 |
+| 文件 | 内容 |
 |---|---|
-| table_4_3_fidelity | Table 4.3 |
-| table_4_4_main_f1 | Table 4.4（RQ1） |
-| table_4_5_best_proportion | Table 4.5 |
-| table_4_6_consistency | Table 4.6（RQ2） |
-| table_4_7_ablation_per_level | Table 4.7（297 行长表） |
-| table_4_8_fidelity_f1_pairs | Table 4.8（RQ3，45 行） |
-| ablation_best_proportion_summary | 新增：各设置下最高 F1 比例的位置和一致性 |
-| ablation_c_smoothness | 新增：嵌套与独立抽样的平滑度三项指标 |
-| rq1_shape_descriptors | 新增：RQ1 的轨迹形状描述量 |
-| rq3_descriptive | 新增：RQ3 的描述规则，以及 fidelity 范围与 F1 范围的对比 |
-| supporting_metrics_all_settings | 辅助指标和混淆矩阵计数（附录用） |
-| paired_diff_vs_baseline_all_levels | 每个比例相对 0% 的配对差（附录用） |
+| rq1_discovery_best | RQ1：seed 100 里最高 F1 的比例（0% 与混合比例并列时取混合比例） |
+| rq1_discovery_trajectories / rq1_discovery_shape | seed 100 的 11 个比例 F1 和曲线形状描述 |
+| rq2_replication_main | RQ2：该比例在 seed 101–104 中相对 0% 的差值、高/平/低次数、是否全部复现 |
+| rq2_per_level_above_baseline | 每个固定比例在验证运行中高于 0% 的次数 |
+| rq2_best_mixed_vs_baseline | 每次验证运行里"最好的混合比例"对 0%（仅作描述，有挑最大值的偏差） |
+| ablation_replication_all_settings / ablation_count_summary | 主实验、B、C 用同一规则的结果，以及每个设置有几个组合全部复现 |
+| ablation_per_level_vs_main | B、C 在每个比例上和主实验的配对差（5 次） |
+| ablation_b_class_shares / ablation_b_confusion | B 的类别漂移和混淆矩阵 |
+| ablation_c_smoothness | 嵌套与独立抽样的平滑度 |
+| rq3_fidelity_by_variable / rq3_fidelity_f1_pairs / rq3_trend_by_fidelity / rq3_descriptive | RQ3：100% 时的保真度与 F1（5 次） |
+| context_mean_sd_all_runs | 5 次的均值（SD），只用来说明波动 |
+| supporting_metrics_all_settings | 辅助指标和混淆矩阵计数 |
+
+`figures/`：fig_rq1_discovery_trajectories、fig_rq2_replication、fig_rq2_per_level_above_baseline、fig_ablation_replication、fig_variability_<数据集>、fig_rq3_trend_by_fidelity、fig_rq3_scatter、fig_rq3_variable_fidelity、fig_rq3_ranges。
+
+消融只保留 B 和 C（Ablation A 已从设计中删除，因为它改变训练集大小，和主实验不可比）。旧结果里的 A 数据会被分析自动忽略，不需要重跑实验。
 
 ## 5. 每次重复都会自动检查的性质（Section 4.2）
 

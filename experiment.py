@@ -131,7 +131,7 @@ def run_repetition(prep, root, params, classifiers, out_dir, device="cpu",
                                 "level": k, "p_nominal": k / 10, "rep": root,
                                 "classifier_seed": clf_seed, "shared_with": shared,
                                 **info, **m})
-        print(f"[{dname} rep {root}] {config.CLASSIFIER_NAMES[c]}: 44 conditions "
+        print(f"[{dname} rep {root}] {config.CLASSIFIER_NAMES[c]}: {len(keys)} conditions "
               f"in {time.time() - t0:.0f}s", flush=True)
 
     pd.DataFrame(metric_rows).to_csv(os.path.join(rep_dir, "metrics.csv"), index=False)

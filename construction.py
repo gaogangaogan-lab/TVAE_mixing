@@ -1,5 +1,5 @@
 """Training-set construction: allocation rule, nested main settings and the
-three ablation variants (Sections 3.6.1 - 3.6.3, 4.2).
+two ablation variants (Sections 3.6.1 - 3.6.3, 4.2).
 
 Record identifiers:
   real records  -> positions 0..N-1 in the imputed real training set
@@ -60,7 +60,7 @@ def _prefix(order, k):
 
 
 def build_all_sets(real_y, pool_y, real_seed, syn_seed, c_seed_fn):
-    """Build the main settings and Ablations A, B, C for one repetition.
+    """Build the main settings and Ablations B and C for one repetition.
 
     real_y   : target array of the real training set (index = real id)
     pool_y   : target array of the synthetic pool (index = pool_id)
@@ -92,11 +92,6 @@ def build_all_sets(real_y, pool_y, real_seed, syn_seed, c_seed_fn):
         main_syn = np.concatenate([_prefix(syn_neg_order, a["Mneg"]),
                                    _prefix(syn_pos_order, a["Mpos"])])
         sets[("main", k)] = SetSpec("main", k, main_real, main_syn)
-
-        # ---- Ablation A: keep all real, add the same synthetic subset ----
-        a_real = np.concatenate([real_neg_order, real_pos_order])
-        sets[("A", k)] = SetSpec("A", k, a_real, main_syn.copy(),
-                                 shared_with=("main", 0) if k == 0 else None)
 
         # ---- Ablation B: unfiltered orderings, fixed size, no class split -
         b_real = _prefix(real_order, n - a["M"])
@@ -157,9 +152,6 @@ def check_properties(sets, real_y, pool_y):
                 problems.append(f"{st} L{k}: class totals changed")
             if (d["n_syn_neg"], d["n_syn_pos"]) != (a["Mneg"], a["Mpos"]):
                 problems.append(f"{st} L{k}: synthetic class counts differ from allocation")
-        dA = describe_set(sets[("A", k)], real_y, pool_y)
-        if dA["n_total"] != n + a["M"]:
-            problems.append(f"A L{k}: size {dA['n_total']} != N+M")
         dB = describe_set(sets[("B", k)], real_y, pool_y)
         if dB["n_total"] != n:
             problems.append(f"B L{k}: size != N")
@@ -168,7 +160,7 @@ def check_properties(sets, real_y, pool_y):
             if len(np.unique(s.real_ids)) != len(s.real_ids) or len(np.unique(s.syn_ids)) != len(s.syn_ids):
                 problems.append(f"{st} L{k}: repeated record ids")
     # nesting of main / A / B components between adjacent levels
-    for st in ("main", "A", "B"):
+    for st in ("main", "B"):
         for k in config.LEVELS[:-1]:
             s0, s1 = sets[(st, k)], sets[(st, k + 1)]
             if not set(s1.real_ids).issubset(set(s0.real_ids)):
